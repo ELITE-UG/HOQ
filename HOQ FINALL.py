@@ -139,34 +139,46 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # --- BAGIAN HEADER BARU DENGAN URL LOGO ELITE ---
-# Membuat 2 kolom layout (kolom_logo lebar 1, kolom_judul lebar 12 agar text memanjang rapi)
 col_logo, col_title = st.columns([1, 12])
 
 with col_logo:
-    # ⚠️ PENTING: Ganti 'NatanaelBayu' di bawah ini dengan Username GitHub-mu yang asli jika berbeda
     url_gambar = "https://raw.githubusercontent.com/NatanaelBayu/fix-goool-hoq/main/ELITE%20UG%20%28Original%29.png"
     st.image(url_gambar, width=95)
 
 with col_title:
-    # Judul ditarik sedikit ke atas dengan margin-top agar simetris dengan logo di sampingnya
     st.markdown('<p class="main-header" style="margin-top: 5px;">Digital House of Quality (HoQ)</p>', unsafe_allow_html=True)
     st.markdown('<p class="sub-header">Optimalisasi Spesifikasi Teknis berdasarkan Voice of Customer</p>', unsafe_allow_html=True)
 
 
-# 2. INISIALISASI DATA (Session State Utama)
+# 2. INISIALISASI DATA DIUBAH SESUAI KEBUTUHAN BARU
 if 'df_whats' not in st.session_state:
     st.session_state.df_whats = pd.DataFrame({
-        "Customer Requirement (WHATs)": ["Tahu tidak mudah hancur", "Rasa kedelai terasa", "Warna kuning cerah", "Harga terjangkau"],
-        "Importance (1-5)": [5, 4, 3, 5]
+        "Customer Requirement (WHATs)": [
+            "memiliki kapasitas besar", 
+            "Mempertimbangkan kualitas material", 
+            "memiliki sifat yang tahan lama", 
+            "memiliki sifat bahan yang kuat", 
+            "memiliki bentuk balok", 
+            "memiliki fitur tambahan"
+        ],
+        "Importance (1-5)": [4, 5, 5, 5, 5, 5]
     })
 
 if 'df_hows' not in st.session_state:
     st.session_state.df_hows = pd.DataFrame({
-        "Technical Requirement (HOWs)": ["Tekanan Mesin Pres", "Kualitas Kedelai", "Lama Perebusan", "Takaran Kunyit"],
-        "Direction": ["Max", "Max", "Target", "Max"]
+        "Technical Requirement (HOWs)": [
+            "jenis material", 
+            "panjang", 
+            "lebar", 
+            "tinggi", 
+            "berat", 
+            "jenis inovasi", 
+            "jenis pelapis"
+        ],
+        "Direction": ["Max", "Max", "Max", "Max", "Min", "Max", "Max"]
     })
 
-# --- TABS STRUKTUR (DENGAN PENYEMPURNAAN ANTARMUKA) ---
+# --- TABS STRUKTUR ---
 t1, t2, t3, t4, t5, t6 = st.tabs([
     "1. WHATs", "2. HOWs", "3. Correlation", "4. Matrix", "5. 🏆 FINAL HOUSE & ACTION PLAN", "🏛️ 6. FULL HOQ ARCHITECTURE"
 ])
@@ -207,7 +219,7 @@ hows_list = [x for x in st.session_state.df_hows["Technical Requirement (HOWs)"]
 with t3:
     st.subheader("Matriks Korelasi Atap (HOWs vs HOWs)")
     st.caption("Pilih nilai korelasi antar spesifikasi teknis")
-    if 'roof_matrix' not in st.session_state or list(st.session_state.roof_matrix.columns) != hows_list:
+    if 'roof_matrix' not in st.session_state or list(st.session_state.roof_matrix.columns) != hows_list or list(st.session_state.roof_matrix.index) != hows_list:
         st.session_state.roof_matrix = pd.DataFrame("No Correlation (0)", index=hows_list, columns=hows_list)
     
     roof_column_config = {
@@ -242,7 +254,6 @@ with t4:
 # --- TAB 5: THE FINAL HOUSE & ACTION PLAN ---
 with t5:
     try:
-        # Perhitungan Nilai Matematika Utama
         valid_whats = st.session_state.df_whats[st.session_state.df_whats["Customer Requirement (WHATs)"].isin(whats_list)]
         weights = valid_whats["Importance (1-5)"].values.astype(float)
         matrix_values = st.session_state.rel_matrix.loc[whats_list, hows_list].values.astype(float)
@@ -251,7 +262,6 @@ with t5:
         total = abs_importance.sum()
         rel_importance = (abs_importance / total * 100) if total > 0 else abs_importance * 0
 
-        # DataFrame Hasil Akhir untuk Chart dan Rekomendasi
         res_df = pd.DataFrame({
             "Requirement": hows_list,
             "Score": abs_importance,
@@ -260,7 +270,6 @@ with t5:
 
         st.write("### 💡 Kesimpulan Strategis & Arah Pengembangan")
         
-        # Ekstrak 3 prioritas teratas berdasarkan perhitungan HOQ
         top_priorities = res_df.head(3)
         priority_names = top_priorities["Requirement"].tolist()
         priority_weights = top_priorities["Weight %"].tolist()
@@ -269,16 +278,18 @@ with t5:
         
         with col_rec:
             st.success(f"✍️ **Rekomendasi Utama Untuk Bisnis Anda:**")
-            st.write(f"""
-            Untuk memaksimalkan kepuasan pelanggan tanpa membuang-buang anggaran, fokuskan seluruh biaya dan resource teknis tim Anda saat ini pada pengembangan: 
-            **{priority_names[0]}**.
-            
-            Spesifikasi ini memegang kontribusi terbesar, yaitu sebesar **{priority_weights[0]}%** dari total seluruh ekspektasi pelanggan yang Anda masukkan.
-            """)
+            if len(priority_names) > 0:
+                st.write(f"""
+                Untuk memaksimalkan kepuasan pelanggan tanpa membuang-buang anggaran, fokuskan seluruh biaya dan resource teknis tim Anda saat ini pada pengembangan: 
+                **{priority_names[0]}**.
+                
+                Spesifikasi ini memegang kontribusi terbesar, yaitu sebesar **{priority_weights[0]}%** dari total seluruh ekspektasi pelanggan yang Anda masukkan.
+                """)
             
         with col_summary:
             st.warning("⚠️ **Urutan Urgensi Rencana Aksi (Action Plan):**")
-            st.write(f"1. **Prioritas Utama (Segera Eksekusi):** Optimalisasi penuh parameter pada `{priority_names[0]}`.")
+            if len(priority_names) > 0:
+                st.write(f"1. **Prioritas Utama (Segera Eksekusi):** Optimalisasi penuh parameter pada `{priority_names[0]}`.")
             if len(priority_names) > 1:
                 st.write(f"2. **Prioritas Sekunder (Pantau Berkala):** Jaga stabilitas kualitas `{priority_names[1]}`.")
             if len(priority_names) > 2:
@@ -293,9 +304,7 @@ with t5:
             
         st.write("---")
 
-        # -------------------------------------------------------------
-        # 1. VISUALISASI MATRIKS ATAP (HOWs vs HOWs) - VERSI CERAH
-        # -------------------------------------------------------------
+        # 1. VISUALISASI MATRIKS ATAP (HOWs vs HOWs)
         st.write("### 🛖 Bagian Atap: Matriks Korelasi Antar Persyaratan Teknis")
         
         html_roof = '<table class="hoq-table">'
@@ -312,7 +321,7 @@ with t5:
                 val = st.session_state.roof_matrix.at[row_name, col_name]
                 
                 simbol = "0"
-                bg_cell = 'style="background-color: #f9fafb; color: #9ca3af;"' # Default cerah netral jika 0
+                bg_cell = 'style="background-color: #f9fafb; color: #9ca3af;"'
                 
                 if "Strong Positive" in val: 
                     simbol = "++"
@@ -334,9 +343,7 @@ with t5:
 
         st.write("")
 
-        # -------------------------------------------------------------
-        # 2. VISUALISASI BADAN & FONDASI RUMAH HOQ - VERSI CERAH
-        # -------------------------------------------------------------
+        # 2. VISUALISASI BADAN & FONDASI RUMAH HOQ
         st.write("### 🏢 Bagian Utama & Fondasi: Matriks Hubungan Terintegrasi")
         
         html_body = '<table class="hoq-table">'
@@ -355,7 +362,7 @@ with t5:
             for col_name in hows_list:
                 score_val = st.session_state.rel_matrix.at[row_name, col_name]
                 
-                bg_cell = 'style="background-color: #f9fafb; color: #9ca3af;"' # Default cerah jika 0
+                bg_cell = 'style="background-color: #f9fafb; color: #9ca3af;"'
                 
                 if score_val == 9: 
                     bg_cell = 'style="background-color: #ffe4e6; color: #9f1239; font-weight: 600;"' 
@@ -387,7 +394,7 @@ with t5:
         
         st.write("---")
         
-        # 3. GRID GRAFIK BAR (VERTIKAL) & BADGE STRATEGIS
+        # 3. GRID GRAFIK BAR & BADGE STRATEGIS
         col_chart, col_rank = st.columns([1.5, 1])
         with col_chart:
             st.write("#### 📈 Grafik Kontribusi Prioritas Teknis")
@@ -436,9 +443,7 @@ with t6:
         html_hoq = '<div class="hoq-scroll-container">'
         html_hoq += '<table class="hoq-table" style="width:auto; margin:auto;">'
         
-        # -------------------------------------------------------------
-        # 1. GENERATE ATAP SEGITIGA (Roof Matrix Upper Triangle) - CERAH
-        # -------------------------------------------------------------
+        # 1. GENERATE ATAP SEGITIGA
         for i in range(n_hows - 1):
             html_hoq += '<tr>'
             html_hoq += '<td class="roof-blank" style="width:250px;"></td>'
@@ -465,12 +470,10 @@ with t6:
                     html_hoq += f'<td class="roof-cell" style="background-color: {bg_color}; color: {text_color} !important;">{simbol}</td>'
             html_hoq += '</tr>'
 
-        # Garis pembatas tipis antara atap segitiga dengan kepala tabel utama
+        # Garis pembatas tipis
         html_hoq += '<tr><td colspan="{}" style="background-color:#e5e7eb; padding:2px; border:none;"></td></tr>'.format(n_hows + 2)
 
-        # -------------------------------------------------------------
         # 2. GENERATE KEPALA TABEL BADAN UTAMA
-        # -------------------------------------------------------------
         html_hoq += '<tr>'
         html_hoq += '<th class="hoq-th-corner">Customer Requirements (WHATs)</th>'
         html_hoq += '<th class="hoq-importance-header">Importance</th>'
@@ -478,9 +481,7 @@ with t6:
             html_hoq += f'<th class="hoq-th-hows">{col}</th>'
         html_hoq += '</tr>'
         
-        # -------------------------------------------------------------
-        # 3. GENERATE BADAN MATRIKS UTAMA (SIMBOL CERAH)
-        # -------------------------------------------------------------
+        # 3. GENERATE BADAN MATRIKS UTAMA
         for idx, row_name in enumerate(whats_list):
             imp_val = weights[idx]
             html_hoq += '<tr>'
@@ -505,9 +506,7 @@ with t6:
                 html_hoq += f'<td {bg_cell}>{simbol_hub}</td>'
             html_hoq += '</tr>'
             
-        # -------------------------------------------------------------
-        # 4. GENERATE FONDASI RUMAH HOQ (CERAH)
-        # -------------------------------------------------------------
+        # 4. GENERATE FONDASI RUMAH HOQ
         # Baris Absolute Importance (Score)
         html_hoq += '<tr class="hoq-score-row">'
         html_hoq += '<td style="text-align: right; font-weight: bold;">Weighted Importance (Score)</td>'
