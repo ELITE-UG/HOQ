@@ -142,7 +142,7 @@ st.markdown("""
 col_logo, col_title = st.columns([1, 12])
 
 with col_logo:
-    url_gambar = "https://raw.githubusercontent.com/NatanaelBayu/fix-goool-hoq/main/ELITE%20UG%20%28Original%29.png"
+    url_gambar = "elite ug (original).png"
     st.image(url_gambar, width=95)
 
 with col_title:
