@@ -530,3 +530,13 @@ with t6:
         
     except Exception as e:
         st.error("Silakan pastikan semua data pada input Tab 1 sampai 4 diisi dengan benar.")
+
+st.markdown("---")
+
+st.markdown("""
+<div style='text-align:center; color:gray; font-size:13px;'>
+<b>House of Quality</b><br>
+Developed by Elementary Laboratory of Industrial Engineering<br>
+© ELITE UG
+</div>
+""", unsafe_allow_html=True)
