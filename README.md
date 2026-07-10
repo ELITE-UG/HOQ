@@ -1,1 +1,2 @@
-# HOQ
+# HOQ (HOUSE OF QUALITY)
+This application is a Python-based House of Quality (HOQ) learning system developed using the Streamlit framework to assist students in understanding the practical implementation of Quality Function Deployment (QFD). The application provides an interactive environment where users can construct and analyze the House of Quality matrix step by step, making the learning process more intuitive, systematic, and efficient.
